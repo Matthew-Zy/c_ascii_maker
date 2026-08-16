@@ -10,7 +10,23 @@ Usage:
 ./cascii.exe path/to/image.png -other [value] --flags
 ```
 
-To build: 
+## To build: 
+### Using CMake 
+- Ensure you have cmake version 3.15+ installed
+- Ensure you have msvc installed on windows and gcc/clang on linux
+- Ensure `build` directory doesn't exist or is empty
+```bash
+# Create and configure
+# add -DCMAKE_BUILD_TYPE=Release for optimzations on linux & mac
+cmake -B build
+
+# Compile
+# In order to build with optimzations on windows, add --config Release for release optimzations
+cmake --build build  
+```
+### Using Makefile
+- Ensure you have make, gcc or clang installed on your device
+- if you are using makefiles to compile on windows, ensure your shell is a bash compatible shell (Such as git bash)
 ```bash
 # Regular build
 make
@@ -21,9 +37,6 @@ make clang
 # compiled with optimizations
 make release
 ```
-Build Requirements:
-- GCC or CLANG version that supports C99
-- GNU Make 
 
 ### Optional flags
 - `-mw` maximum width  (Default terminal width or 96 characters)  
@@ -41,13 +54,10 @@ Note that if you use output on a colored image without setting the `--usebw` fla
 
 ```bash
 # viewing outputted image 
-./cascii.exe lightning.jpg -o lightning.txt
+./cascii.exe images/lightning.jpg -o lightning.txt
 
-# use cat
+# use cat to view
 cat lightning.txt
-
-# use less to view
-less -R lightning.txt
 
 # or just use cascii to read it
 ./cascii.exe -r lightning
@@ -59,23 +69,23 @@ less -R lightning.txt
 nvim lightning-normal.txt
 
 # or you can open with notepad
-notepad++ lightning-normal.txt
+notepad lightning-normal.txt
 ```
 
 
 Example use cases 
 ```bash
 # use default paramters for everything
-./cascii.exe lightning.jpg
+./cascii.exe images/lightning.jpg
 
 # Dont brighten image and effectively turn off the sobel threshold
-./cascii.exe lightning.jpg -ba 1 -set 255.0
+./cascii.exe images/lightning.jpg -ba 1 -set 255.0
 
 # produce black and white output
-./cascii.exe lightning.jpg --usebw
+./cascii.exe images/lightning.jpg --usebw
 
 # Output to a file
-./cascii.exe lightning.jpg -o lightning.txt
+./cascii.exe images/lightning.jpg -o lightning.txt
 
 # Using custom characters for an image using whitespace, a, b and E
 ./cascii.exe images/imposter.jpg -c " abE" 
