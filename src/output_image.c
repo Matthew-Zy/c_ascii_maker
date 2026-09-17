@@ -42,6 +42,15 @@ char get_sobel_angle_char(double sobel_angle) {
 void output_the_image(image_information* img, double sobel_threshhold, FILE* outstream) {
     for (size_t y = 0; y < img->height; y++) {
         for (size_t x = 0; x < img->width; x++) {
+            if (img->channels == 4) {
+                double* pixel = get_pixel(img, x, y);
+                if (pixel[3] == 0.0) {
+                    fprintf(outstream, " ");
+                    continue;
+                }
+            }
+
+
             double sobel_x = get_sobel_x(img, x, y);
             double sobel_y = get_sobel_y(img, x, y);
             double sobel_magnitude = sqrt(sobel_x * sobel_x + sobel_y * sobel_y);
@@ -159,6 +168,7 @@ void produce_output(args_list* args) {
     }
     resize_image(img, args->max_width, args->max_height, args->character_ratio);
 
+    // print_image_information(img);
     out_image(img, args->brighten_amount, args->edge_sobel_threshold, args->color_option, args->output_file_path);
     
     rc_free_image_info(img);

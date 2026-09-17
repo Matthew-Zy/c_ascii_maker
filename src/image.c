@@ -268,13 +268,13 @@ double find_min(double a, double b) {
     return a < b ? a : b;
 }
 void brighten_image(image_information* img, double brighten_amount) {
-    
-    
+    // clamp at 3 since we don't want to increase the 'alpha' value on images with 4 channels.
+    size_t max_channels = img->channels <= 3 ? img->channels : 3;
     for (size_t y = 0; y < img->height; y++) {
         // i SPENT like 10 minutes debugging just to realized i wrote x > img->width instead of < bruhify
         for (size_t x = 0; x < img->width; x++) {
             double* pixel = get_pixel(img, x, y);
-            for (size_t i = 0; i < img->channels; i++) {
+            for (size_t i = 0; i < max_channels; i++) {
                 pixel[i] = find_min(pixel[i]*brighten_amount, 255.0);
             }
             
