@@ -104,10 +104,6 @@ void set_pixel(image_information* image, size_t x, size_t y, double* new_pixel) 
 void write_average_pixel(image_information* img, double* average_pixel, size_t x1, size_t x2, size_t y1, size_t y2) {
     double total_pixels = (double) (x2-x1) * (y2 - y1);
 
-    if (total_pixels == 0) {
-        // fuckass cant code for shit -> bug mentioned in comment below
-        total_pixels = 1;
-    }
     // fuck i made rc_malloc so i will refuse to use calloc
     // also i realiezd that because this is single threaded rc_malloc is just lowkey kinda useless #thought ahead
     for (size_t i = 0; i < img->channels; i++) {
@@ -116,7 +112,10 @@ void write_average_pixel(image_information* img, double* average_pixel, size_t x
     for (size_t _x = x1; _x < x2; _x++) {
         for (size_t _y = y1; _y < y2; _y++) {
             double* pixel = get_pixel(img, _x, _y);
-
+            if (img->channels == 4 && pixel[3] == 0) {
+                total_pixels -= 1;
+                continue;
+            }
             for (size_t i = 0; i < img->channels; i++) {
                 average_pixel[i] += pixel[i];
             }
@@ -124,7 +123,9 @@ void write_average_pixel(image_information* img, double* average_pixel, size_t x
     }
 
     
-
+    if (total_pixels <= 0) {
+        total_pixels = 1;
+    }
     for (size_t i = 0; i < img->channels; i++) {
         average_pixel[i] = average_pixel[i] / total_pixels;
     }
@@ -268,13 +269,13 @@ double find_min(double a, double b) {
     return a < b ? a : b;
 }
 void brighten_image(image_information* img, double brighten_amount) {
-    
-    
+    // clamp at 3 since we don't want to increase the 'alpha' value on images with 4 channels.
+    size_t max_channels = img->channels <= 3 ? img->channels : 3;
     for (size_t y = 0; y < img->height; y++) {
         // i SPENT like 10 minutes debugging just to realized i wrote x > img->width instead of < bruhify
         for (size_t x = 0; x < img->width; x++) {
             double* pixel = get_pixel(img, x, y);
-            for (size_t i = 0; i < img->channels; i++) {
+            for (size_t i = 0; i < max_channels; i++) {
                 pixel[i] = find_min(pixel[i]*brighten_amount, 255.0);
             }
             
